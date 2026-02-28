@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon E-Commerce Sales Forecasting | Sahil Nakadi | Power BI Project</title>
+    <meta name="description" content="Power BI forecasting model and trend analysis for Amazon e-commerce sales. Visualises seasonality, revenue patterns and product performance. Built by Sahil Nakadi.">
+    <meta name="author" content="Sahil Nakadi">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Amazon E-Commerce Sales Forecasting | Sahil Nakadi">
+    <meta property="og:description" content="Power BI sales forecasting with time series analysis, seasonality and product performance metrics.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #FF3366;
+            --secondary: #FF6B35;
+            --dark: #0A0E27;
+            --gray: #64748B;
+            --light-gray: #F8FAFC;
+        }
+        
+        body { font-family: 'Inter', -apple-system, sans-serif; color: var(--dark); line-height: 1.6; }
+        
+        nav { position: fixed; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #E2E8F0; z-index: 1000; padding: 1rem 0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--dark); text-decoration: none; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--gray); text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        
+        .hero { padding: 150px 2rem 80px; background: linear-gradient(135deg, #FFF5F5 0%, #FFE8DD 100%); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; color: var(--gray); text-decoration: none; font-weight: 500; transition: all 0.3s; }
+        .back-link:hover { color: var(--primary); gap: 1rem; }
+        .back-link svg { width: 20px; height: 20px; }
+        
+        .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .tag { padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-size: 0.875rem; font-weight: 600; border-radius: 6px; }
+        
+        h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 1.5rem; }
+        .lead { font-size: 1.25rem; color: var(--gray); line-height: 1.8; max-width: 800px; }
+        
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+        .meta-card { padding: 1.5rem; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .meta-label { font-size: 0.875rem; color: var(--gray); margin-bottom: 0.5rem; }
+        .meta-value { font-weight: 600; font-size: 1.125rem; }
+        
+        .content { padding: 4rem 0; }
+        section { margin-bottom: 4rem; }
+        h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.75rem, 3vw, 2.5rem); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #E2E8F0; }
+        h3 { font-size: 1.5rem; margin: 2rem 0 1rem; }
+        p { color: var(--gray); line-height: 1.8; margin-bottom: 1rem; }
+        
+        .highlight { padding: 1.5rem; background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 107, 53, 0.1)); border-left: 4px solid var(--primary); border-radius: 8px; margin: 2rem 0; }
+        .highlight strong { color: var(--dark); display: block; margin-bottom: 0.5rem; }
+        .highlight ul { padding-left: 1.5rem; }
+        .highlight li { margin: 0.5rem 0; color: var(--gray); }
+        
+        .qa-grid { display: grid; gap: 1.5rem; margin: 2rem 0; }
+        .qa-card { padding: 1.5rem; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 3px solid var(--primary); }
+        .qa-question { font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; font-size: 1.125rem; }
+        .qa-answer { color: var(--gray); line-height: 1.7; }
+        
+        .data-fields { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+        .field-tag { padding: 0.5rem 1rem; background: var(--light-gray); color: var(--gray); font-size: 0.8125rem; border-radius: 6px; font-family: 'Courier New', monospace; }
+        
+        .btn { display: inline-block; padding: 1rem 2rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3); }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid #E2E8F0; }
+        
+        .nav-buttons { display: flex; justify-content: space-between; padding: 3rem 0; border-top: 2px solid #E2E8F0; margin-top: 3rem; }
+        
+        footer { background: var(--dark); color: var(--gray); padding: 2rem; text-align: center; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .footer-links { display: flex; gap: 2rem; }
+        .footer-links a { color: var(--gray); text-decoration: none; }
+        .footer-links a:hover { color: white; }
+        
+        @media (max-width: 768px) {
+            .nav-buttons { flex-direction: column; gap: 1rem; }
+            .footer-content { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">AnalyzeWithSahil</a>
+            <ul class="nav-links">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="container">
+            <a href="index.html#projects" class="back-link">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M16 10H4M4 10L9 5M4 10L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Back to Projects
+            </a>
+            
+            <div class="tags">
+                <span class="tag">Power BI</span>
+                <span class="tag">Time Series</span>
+                <span class="tag">Forecasting</span>
+            </div>
+
+            <h1>Amazon E-Commerce Sales Forecasting</h1>
+            <p class="lead">
+                Comprehensive sales forecasting model and trend analysis for e-commerce data, visualizing seasonality, 
+                revenue patterns, and product performance metrics to drive strategic decision-making.
+            </p>
+
+            <div class="meta-grid">
+                <div class="meta-card">
+                    <div class="meta-label">Data Source</div>
+                    <div class="meta-value">SuperStore Sales Dataset</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">Tools Used</div>
+                    <div class="meta-value">Power BI, DAX</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">Focus Area</div>
+                    <div class="meta-value">Sales Forecasting, Trends</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="container">
+            <section>
+                <h2>🎯 Project Overview</h2>
+                <p>
+                    This project uses the <strong>SuperStore Sales Dataset</strong> (CSV file) containing information 
+                    on orders, products, and shipping details to analyze performance, identify sales trends, and forecast 
+                    future results. A separate <strong>Sales Forecast</strong> table extends the analysis by predicting 
+                    upcoming sales based on historical patterns.
+                </p>
+
+                <h3>Key Data Fields</h3>
+                <p>The dataset includes comprehensive order and product information:</p>
+                <div class="data-fields">
+                    <span class="field-tag">Order Date</span>
+                    <span class="field-tag">Category</span>
+                    <span class="field-tag">Sub-Category</span>
+                    <span class="field-tag">City</span>
+                    <span class="field-tag">Customer ID</span>
+                    <span class="field-tag">Payment Mode</span>
+                    <span class="field-tag">Profit</span>
+                    <span class="field-tag">Quantity</span>
+                    <span class="field-tag">Region</span>
+                    <span class="field-tag">Sales</span>
+                    <span class="field-tag">Discount</span>
+                </div>
+            </section>
+
+            <section>
+                <h2>❓ Problem Statement</h2>
+                <p>
+                    An e-commerce platform wants to <strong>boost sales and maximize profit</strong> by understanding:
+                </p>
+
+                <div class="highlight">
+                    <strong>Key Questions:</strong>
+                    <ul>
+                        <li>Which categories and sub-categories are driving the most revenue and profit?</li>
+                        <li>Which regions are the best performers, and how do shipping modes affect sales?</li>
+                        <li>What are the monthly/yearly sales trends and forecasted future performance?</li>
+                        <li>What payment methods do customers prefer?</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔧 Approach & Solution</h2>
+                
+                <div class="highlight">
+                    <strong>Data Preparation Steps:</strong>
+                    <ul>
+                        <li>Imported SuperStore Sales Dataset into Power BI</li>
+                        <li>Checked for missing values and data quality issues</li>
+                        <li>Performed data type transformations for dates and numeric fields</li>
+                        <li>Created calculated columns and measures using DAX</li>
+                        <li>Built time-series forecasting model for future sales prediction</li>
+                    </ul>
+                </div>
+
+                <h3>Forecasting Methodology</h3>
+                <p>
+                    The forecasting model leverages Power BI's built-in analytics capabilities to predict future sales 
+                    based on historical patterns, accounting for seasonality and trends observed in the data.
+                </p>
+            </section>
+
+            <section>
+                <h2>💡 Analysis Insights</h2>
+                
+                <div class="qa-grid">
+                    <div class="qa-card">
+                        <div class="qa-question">📦 Which category drives the highest revenue?</div>
+                        <div class="qa-answer">
+                            <strong>Office Supplies</strong> generates the highest revenue, followed by 
+                            <strong>Technology</strong> and <strong>Furniture</strong>. This insight helps 
+                            prioritize inventory and marketing efforts.
+                        </div>
+                    </div>
+
+                    <div class="qa-card">
+                        <div class="qa-question">🌍 Which region shows the highest sales?</div>
+                        <div class="qa-answer">
+                            The <strong>West region (33.3%)</strong> leads in total sales. However, profit 
+                            <strong>decreased by approximately 43.88% in 2020</strong> compared to 2019, indicating 
+                            a need for cost optimization strategies.
+                        </div>
+                    </div>
+
+                    <div class="qa-card">
+                        <div class="qa-question">🚚 What is the most common shipping mode?</div>
+                        <div class="qa-answer">
+                            <strong>Standard Class</strong> shipping mode accounts for the majority of orders, likely 
+                            due to cost-effectiveness. This suggests customers prioritize value over speed.
+                        </div>
+                    </div>
+
+                    <div class="qa-card">
+                        <div class="qa-question">📈 What does the forecast show?</div>
+                        <div class="qa-answer">
+                            Sales generally peak in <strong>November/December</strong> (holiday season). The forecast 
+                            indicates a potential <strong>5-10% increase</strong> in the upcoming quarter, suggesting 
+                            positive growth trajectory.
+                        </div>
+                    </div>
+
+                    <div class="qa-card">
+                        <div class="qa-question">💳 Which payment mode do customers prefer?</div>
+                        <div class="qa-answer">
+                            <strong>Cash on Delivery (COD)</strong> is preferred by 42.62% of customers, followed by 
+                            <strong>Online Payments</strong> at 35.38%. This highlights the importance of maintaining 
+                            diverse payment options.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🔍 Key Findings</h2>
+                
+                <div class="highlight">
+                    <strong>Major Insights:</strong>
+                    <ul>
+                        <li>📱 <strong>Top Products:</strong> Phones, Binders, and Chairs consistently rank among top revenue generators</li>
+                        <li>🎄 <strong>Seasonality:</strong> Significant sales spikes during end-of-year indicate effective holiday campaigns</li>
+                        <li>🚀 <strong>Shipping:</strong> Standard Class remains most popular despite premium options available</li>
+                        <li>🔮 <strong>Growth:</strong> Forecasted 5-10% growth suggests expansion opportunities</li>
+                        <li>💰 <strong>Profit:</strong> 43.88% profit decrease in 2020 highlights need for cost optimization</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>🎉 Results & Business Impact</h2>
+                
+                <div class="highlight">
+                    <strong>Measurable Outcomes:</strong>
+                    <ul>
+                        <li>Improved forecasting accuracy enabling better inventory planning</li>
+                        <li>Identified seasonal patterns informing marketing campaign timing</li>
+                        <li>Regional insights driving targeted expansion strategies</li>
+                        <li>Product performance visibility supporting data-driven pricing decisions</li>
+                        <li>Payment method optimization improving checkout conversion rates</li>
+                    </ul>
+                </div>
+
+                <h3>Future Enhancements</h3>
+                <p>
+                    Potential next steps include integrating customer segmentation analysis, implementing advanced 
+                    machine learning models for more accurate forecasting, and adding competitive benchmarking data 
+                    for market positioning insights.
+                </p>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="project-sales-management.html" class="btn btn-secondary">← Previous Project</a>
+                <a href="index.html#projects" class="btn">Back to Projects</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div>© 2025 <strong>AnalyzeWithSahil</strong> · Built in Pune, India</div>
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/sahilnakadi" target="_blank">LinkedIn</a>
+                <a href="mailto:sahilnakadi04@gmail.com">Email</a>
+            </div>
